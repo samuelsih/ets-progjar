@@ -88,7 +88,41 @@
 <details>
     <summary>1000 Request, 100 Concurrency</summary>
 
-    
+    Server Software:        myserver/1.0
+    Server Hostname:        localhost
+    Server Port:            8889
+
+    Document Path:          /testing.txt
+    Document Length:        22 bytes
+
+    Concurrency Level:      100
+    Time taken for tests:   364.697 seconds
+    Complete requests:      1000
+    Failed requests:        0
+    Total transferred:      159000 bytes
+    HTML transferred:       22000 bytes
+    Requests per second:    2.74 [#/sec] (mean)
+    Time per request:       36469.745 [ms] (mean)
+    Time per request:       364.697 [ms] (mean, across all concurrent requests)
+    Transfer rate:          0.43 [Kbytes/sec] received
+
+    Connection Times (ms)
+                  min  mean[+/-sd] median   max
+    Connect:        0  358 325.5    502    1531
+    Processing:  3073 34285 10232.6  32928   57075
+    Waiting:        2 18354 10898.9  17283   52023
+    Total:       3584 34643 10282.4  33108   58091
+
+    Percentage of the requests served within a certain time (ms)
+    50%  33108
+    66%  37643
+    75%  44643
+    80%  46713
+    90%  48626
+    95%  52488
+    98%  55013
+    99%  56548
+    100%  58091 (longest request)
 </details>
 
 <details>
