@@ -1,6 +1,4 @@
-import sys
 import os.path
-import uuid
 from glob import glob
 from datetime import datetime
 
@@ -61,26 +59,26 @@ class HttpServer:
 		except IndexError:
 			return self.response(400,'Bad Request','',{})
 	def http_get(self,object_address,headers):
-		files = glob('./*')
-		print(files)
-		thedir='./'
+		print(object_address, headers)
+		files = glob('*')
+		print(f"INI FILE: {files}")
+		
 		if (object_address == '/'):
 			return self.response(200,'OK','Ini Adalah web Server percobaan',dict())
-
 		if (object_address == '/video'):
 			return self.response(302,'Found','',dict(location='https://youtu.be/katoxpnTf04'))
 		if (object_address == '/santai'):
 			return self.response(200,'OK','santai saja',dict())
 
-
 		object_address=object_address[1:]
-		if thedir+object_address not in files:
+
+		if object_address not in files:
 			return self.response(404,'Not Found','',{})
-		fp = open(thedir+object_address,'rb') #rb => artinya adalah read dalam bentuk binary
+		fp = open(object_address,'rb') #rb => artinya adalah read dalam bentuk binary
 		#harus membaca dalam bentuk byte dan BINARY
 		isi = fp.read()
 		
-		fext = os.path.splitext(thedir+object_address)[1]
+		fext = os.path.splitext(object_address)[1]
 		content_type = self.types[fext]
 		
 		headers={}
@@ -98,10 +96,10 @@ class HttpServer:
 
 if __name__=="__main__":
 	httpserver = HttpServer()
-	d = httpserver.proses('GET testing.txt HTTP/1.0')
+	d = httpserver.proses('GET /testing.txt HTTP/1.0')
 	print(d)
-	d = httpserver.proses('GET donalbebek.jpg HTTP/1.0')
-	print(d)
+	# d = httpserver.proses('GET donalbebek.jpg HTTP/1.0')
+	# print(d)
 	#d = httpserver.http_get('testing2.txt',{})
 	#print(d)
 #	d = httpserver.http_get('testing.txt')
