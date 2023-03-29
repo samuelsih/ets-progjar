@@ -24,12 +24,10 @@ class ProcessTheClient(threading.Thread):
 					rcv=rcv+d
 					if rcv[-2:]=='\r\n':
 						#end of command, proses string
-						logging.warning("data dari client: {}" . format(rcv))
 						hasil = httpserver.proses(rcv)
 						#hasil akan berupa bytes
 						#untuk bisa ditambahi dengan string, maka string harus di encode
 						hasil=hasil+"\r\n\r\n".encode()
-						logging.warning("balas ke  client: {}" . format(hasil))
 						#hasil sudah dalam bentuk bytes
 						self.connection.sendall(hasil)
 						rcv=""
@@ -49,10 +47,9 @@ class Server(threading.Thread):
 
 	def run(self):
 		self.my_socket.bind(('localhost', 8889))
-		self.my_socket.listen(1)
+		self.my_socket.listen(1000)
 		while True:
 			self.connection, self.client_address = self.my_socket.accept()
-			logging.warning("connection from {}".format(self.client_address))
 
 			clt = ProcessTheClient(self.connection, self.client_address)
 			clt.start()

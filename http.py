@@ -59,9 +59,7 @@ class HttpServer:
 		except IndexError:
 			return self.response(400,'Bad Request','',{})
 	def http_get(self,object_address,headers):
-		print(object_address, headers)
 		files = glob('*')
-		print(f"INI FILE: {files}")
 		
 		if (object_address == '/'):
 			return self.response(200,'OK','Ini Adalah web Server percobaan',dict())

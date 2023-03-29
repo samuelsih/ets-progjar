@@ -2,18 +2,11 @@ import os
 from socket import *
 import socket
 import threading
-import time
-import sys
 import logging
 import ssl
-
-
-
-
 from http import HttpServer
 
 httpserver = HttpServer()
-
 
 class ProcessTheClient(threading.Thread):
 	def __init__(self, connection, address):
@@ -33,12 +26,10 @@ class ProcessTheClient(threading.Thread):
 					rcv=rcv+d
 					if rcv[-2:]=='\r\n':
 						#end of command, proses string
-						logging.warning("data dari client: {}" . format(rcv))
 						hasil = httpserver.proses(rcv)
 						#hasil akan berupa bytes
 						#untuk bisa ditambahi dengan string, maka string harus di encode
 						hasil=hasil+"\r\n\r\n".encode()
-						logging.warning("balas ke  client: {}" . format(hasil))
 						#hasil sudah dalam bentuk bytes
 						self.connection.sendall(hasil)
 						rcv=""
@@ -58,6 +49,7 @@ class Server(threading.Thread):
 		self.hostname = hostname
 		cert_location = os.getcwd() + '/certs/'
 		self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+		self.context.verify_mode = ssl.CERT_OPTIONAL
 		self.context.load_cert_chain(certfile=cert_location + 'domain.crt',
 									 keyfile=cert_location + 'domain.key')
 #---------------------------------
@@ -66,21 +58,17 @@ class Server(threading.Thread):
 		threading.Thread.__init__(self)
 
 	def run(self):
-		self.my_socket.bind(('0.0.0.0', 8443))
+		self.my_socket.bind(('localhost', 8443))
 		self.my_socket.listen(1)
 		while True:
-			self.connection, self.client_address = self.my_socket.accept()
+			connection, client_address = self.my_socket.accept()
 			try:
-				self.secure_connection = self.context.wrap_socket(self.connection, server_side=True)
-				logging.warning("connection from {}".format(self.client_address))
-				clt = ProcessTheClient(self.secure_connection, self.client_address)
+				secure_connection = self.context.wrap_socket(connection, server_side=True)
+				clt = ProcessTheClient(secure_connection, client_address)
 				clt.start()
 				self.the_clients.append(clt)
 			except ssl.SSLError as essl:
 				print(str(essl))
-
-
-
 
 def main():
 	svr = Server()
