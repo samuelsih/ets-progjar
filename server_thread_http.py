@@ -1,10 +1,13 @@
 from socket import *
 import socket
 import threading
+import time
+import sys
 import logging
 from http import HttpServer
 
 httpserver = HttpServer()
+
 
 class ProcessTheClient(threading.Thread):
 	def __init__(self, connection, address):
@@ -24,10 +27,12 @@ class ProcessTheClient(threading.Thread):
 					rcv=rcv+d
 					if rcv[-2:]=='\r\n':
 						#end of command, proses string
+						logging.warning("data dari client: {}" . format(rcv))
 						hasil = httpserver.proses(rcv)
 						#hasil akan berupa bytes
 						#untuk bisa ditambahi dengan string, maka string harus di encode
 						hasil=hasil+"\r\n\r\n".encode()
+						logging.warning("balas ke  client: {}" . format(hasil))
 						#hasil sudah dalam bentuk bytes
 						self.connection.sendall(hasil)
 						rcv=""
@@ -38,6 +43,8 @@ class ProcessTheClient(threading.Thread):
 				pass
 		self.connection.close()
 
+
+
 class Server(threading.Thread):
 	def __init__(self):
 		self.the_clients = []
@@ -46,19 +53,22 @@ class Server(threading.Thread):
 		threading.Thread.__init__(self)
 
 	def run(self):
-		self.my_socket.bind(('localhost', 8889))
-		self.my_socket.listen(5)
+		self.my_socket.bind((socket.gethostname(), 10000))
+		self.my_socket.listen(500)
 		while True:
 			self.connection, self.client_address = self.my_socket.accept()
+			logging.warning("connection from {}".format(self.client_address))
 
 			clt = ProcessTheClient(self.connection, self.client_address)
 			clt.start()
 			self.the_clients.append(clt)
 
+
+
 def main():
-	svr = Server()
-	svr.start()
+    print(f"Starting on {(socket.gethostname(), 10000)}")
+    svr = Server()
+    svr.start()
 
 if __name__=="__main__":
 	main()
-

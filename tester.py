@@ -1,1 +1,0 @@
-print("C:\\Users\\Samuel\\rootCA.pem")

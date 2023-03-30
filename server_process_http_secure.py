@@ -6,11 +6,8 @@ import time
 import sys
 import logging
 import ssl
-
-
-
-
 from http import HttpServer
+from multiprocessing import Process
 
 httpserver = HttpServer()
 
@@ -51,7 +48,7 @@ class ProcessTheClient(threading.Thread):
 
 
 
-class Server(threading.Thread):
+class Server(Process):
 	def __init__(self,hostname='testing.net'):
 		self.the_clients = []
 #------------------------------
@@ -63,7 +60,7 @@ class Server(threading.Thread):
 #---------------------------------
 		self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		threading.Thread.__init__(self)
+		Process.__init__(self)
 
 	def run(self):
 		self.my_socket.bind((socket.gethostname(), 8443))

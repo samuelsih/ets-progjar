@@ -1,16 +1,11 @@
-import os
 from socket import *
 import socket
 import threading
 import time
 import sys
 import logging
-import ssl
-
-
-
-
 from http import HttpServer
+from multiprocessing import Process
 
 httpserver = HttpServer()
 
@@ -51,39 +46,29 @@ class ProcessTheClient(threading.Thread):
 
 
 
-class Server(threading.Thread):
-	def __init__(self,hostname='testing.net'):
+class Server(Process):
+	def __init__(self):
 		self.the_clients = []
-#------------------------------
-		self.hostname = hostname
-		cert_location = os.getcwd() + '/certs/'
-		self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-		self.context.load_cert_chain(certfile=cert_location + 'domain.crt',
-									 keyfile=cert_location + 'domain.key')
-#---------------------------------
 		self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		threading.Thread.__init__(self)
+		Process.__init__(self)
 
 	def run(self):
-		self.my_socket.bind((socket.gethostname(), 8443))
+		self.my_socket.bind((socket.gethostname(), 10000))
 		self.my_socket.listen(500)
 		while True:
 			self.connection, self.client_address = self.my_socket.accept()
-			try:
-				self.secure_connection = self.context.wrap_socket(self.connection, server_side=True)
-				logging.warning("connection from {}".format(self.client_address))
-				clt = ProcessTheClient(self.secure_connection, self.client_address)
-				clt.start()
-				self.the_clients.append(clt)
-			except ssl.SSLError as essl:
-				print(str(essl))
+			logging.warning("connection from {}".format(self.client_address))
 
+			clt = ProcessTheClient(self.connection, self.client_address)
+			clt.daemon = True
+			clt.start()
+			self.the_clients.append(clt)
 
 
 
 def main():
-    print(f"Starting on {(socket.gethostname(), 8443)}")
+    print(f"Starting on {(socket.gethostname(), 10000)}")
     svr = Server()
     svr.start()
 
